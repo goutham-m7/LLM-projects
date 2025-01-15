@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DALLE Image Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <style>
+      body {
+        background-color: #f9f9f9;
+      }
+      .navbar {
+        background-color: #1e3a8a;
+      }
+      .navbar-brand {
+        color: #fff;
+      }
+      .container {
+        max-width: 800px;
+        margin-top: 50px;
+      }
+      .form-control {
+        border-radius: 30px;
+      }
+      .btn-primary {
+        background-color: #1e3a8a;
+        border-radius: 30px;
+        width: 100%;
+      }
+      .btn-primary:hover {
+        background-color: #1d3452;
+      }
+      .svgContainer {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 30px;
+      }
+      .imageCont img {
+        border-radius: 15px;
+        transition: transform 0.3s ease-in-out;
+      }
+      .imageCont img:hover {
+        transform: scale(1.05);
+      }
+      .loadingGif {
+        display: none;
+        width: 100px;
+        height: 100px;
+        margin-top: 20px;
+      }
+      .footer {
+        background-color: #1e3a8a;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        position: fixed;
+        width: 100%;
+        bottom: 0;
+      }
+    </style>
+  </head>
+  <body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">DALLE Image Generator</a>
+      </div>
+    </nav>
+
+    <div class="container">
+      <h1 class="my-4 text-center">Generate Your Images with DALLE</h1>
+      
+      <form>
+        <div class="mb-3">
+          <label for="imgprompt" class="form-label">Enter your prompt:</label>
+          <input id="imgprompt" type="text" class="form-control" placeholder="Describe the image you want">
+        </div>
+        <button id="submitbtn" type="submit" class="btn btn-primary">Generate Image</button>
+      </form>
+
+      <div class="svgContainer">
+        <svg class="loadingGif" id="loadingGif" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" xmlns:xlink="http://www.w3.org/1999/xlink">
+          <g transform="rotate(0 50 50)">
+            <rect x="47" y="24" rx="3" ry="6" width="6" height="12" fill="#000000">
+              <animate attributeName="opacity" values="1;0" keyTimes="0;1" dur="1s" begin="-0.9166666666666666s" repeatCount="indefinite"></animate>
+            </rect>
+          </g>
+          <g transform="rotate(30 50 50)">
+            <rect x="47" y="24" rx="3" ry="6" width="6" height="12" fill="#000000">
+              <animate attributeName="opacity" values="1;0" keyTimes="0;1" dur="1s" begin="-0.8333333333333334s" repeatCount="indefinite"></animate>
+            </rect>
+          </g>
+          <g transform="rotate(60 50 50)">
+            <rect x="47" y="24" rx="3" ry="6" width="6" height="12" fill="#000000">
+              <animate attributeName="opacity" values="1;0" keyTimes="0;1" dur="1s" begin="-0.75s" repeatCount="indefinite"></animate>
+            </rect>
+          </g>
+        </svg>
+      </div>
+
+      <div class="row imageCont">
+        <!-- Generated images will be displayed here -->
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>&copy; 2025 DALLE Image Generator | All rights reserved.</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <script>
+      const submitbtn = document.getElementById("submitbtn");
+      const loadingGif = document.getElementById("loadingGif");
+      const imgprompt = document.getElementById("imgprompt");
+      const container = document.querySelector(".imageCont");
+
+      submitbtn.addEventListener("click", (e) => {
+        loadingGif.classList.remove("d-none");
+        e.preventDefault();
+        const promptTxt = imgprompt.value;
+        fetch("/generateimages/" + promptTxt)
+          .then(response => response.json())
+          .then(data => {
+            loadingGif.classList.add("d-none");
+            const images = data.data;
+            let totalHtml = "";
+            images.forEach(image => {
+              let html = `<div class="col-md-4 my-2">
+                <img src="${image.url}" class="img-fluid">
+              </div>`;
+              totalHtml += html;
+            });
+            container.innerHTML = totalHtml;
+          });
+      });
+    </script>
+
+  </body>
+</html>
